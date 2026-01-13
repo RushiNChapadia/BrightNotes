@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.newapp5.ui.theme.NewApp5Theme
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
