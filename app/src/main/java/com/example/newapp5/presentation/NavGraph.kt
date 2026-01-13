@@ -17,10 +17,12 @@ fun NavGraph(
         navController = navController
     ) {
         composable("list") {
-            ListScreen() {
-                Log.d("TAG", "NavGraph: Click event from child")
-                navController.navigate("details")
-            }
+            ListScreen(
+                onItemClick = {
+                    Log.d("TAG", "NavGraph: Click event from child")
+                    navController.navigate("details")
+                }
+            )
         }
         composable("details") { DetailScreen() }
     }
