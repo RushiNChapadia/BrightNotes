@@ -16,10 +16,10 @@ class NotesRepository @Inject constructor(val notesDao: NotesDao) {
     }
 
     suspend fun deleteInLocal(notesEntity: NotesEntity){
-        //
+        notesDao.deleteNotes(notesEntity)
     }
 
     suspend fun updateNotesInLocal(notesEntity: NotesEntity){
-        //
-    }
+        notesDao.updateNotes(notesEntity)
+     }
 }
