@@ -1,7 +1,7 @@
 package com.example.newapp5.domain.repository
 
-import com.example.newapp5.data.NotesDao
-import com.example.newapp5.data.NotesEntity
+import com.example.newapp5.data.local.NotesDao
+import com.example.newapp5.data.local.NotesEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
