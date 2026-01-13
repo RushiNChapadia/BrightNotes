@@ -1,5 +1,6 @@
 package com.example.newapp5.presentation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.tooling.ComposeToolingApi
 import androidx.navigation.NavController
@@ -8,14 +9,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
 @Composable
-fun  NavGraph (
+fun NavGraph(
     navController: NavHostController
 ) {
     NavHost(
         startDestination = "list",
-        navController =  navController
+        navController = navController
     ) {
-        composable ("list"){ ListScreen()  }
-        composable ("detail"){ DetailScreen() }
+        composable("list") {
+            ListScreen() {
+                Log.d("TAG", "NavGraph: Click event from child")
+                navController.navigate("details")
+            }
+        }
+        composable("details") { DetailScreen() }
     }
 }
