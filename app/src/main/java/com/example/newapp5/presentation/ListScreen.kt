@@ -1,23 +1,27 @@
 package com.example.newapp5.presentation
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,12 +43,18 @@ import com.example.newapp5.domain.Note
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListScreen(onItemClick: () -> Unit,  viewModel: ListViewModel = hiltViewModel()) {
+fun ListScreen(onItemClick: () -> Unit, viewModel: NotesViewModel = hiltViewModel()) {
 
-    val uiState = viewModel.uiState.collectAsState().value
+    val uiState = viewModel.resultState.collectAsState().value
     var showDialog by remember { mutableStateOf(false) }
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        viewModel.getNotesList()
+    }
+
+    //No items - state
+    // items - state
+    //loading - state
 
 
     Scaffold(
@@ -69,68 +80,68 @@ fun ListScreen(onItemClick: () -> Unit,  viewModel: ListViewModel = hiltViewMode
         }
     )
     { paddingValues ->
-//        LazyColumn(Modifier.padding(paddingValues)) {
-//            items(uiState.items) { item ->
-//                NoteRow(item) {
-//                    onItemClick()
-//                }
-//            }
-//        }
+
+        LazyColumn(Modifier.padding(paddingValues)) {
+            items(uiState.items) { item ->
+                NoteRow(
+                    item,
+                    onItemClick = onItemClick,
+                    onDelete = {
+                        viewModel.deleteNote(item)
+                    })
+            }
+        }
 
     }
 
-
-    if (showDialog){
-       AlertDialog(
-           title = {
-               Text(
-                   text = "New note",
-                   color = Color.Blue,
-                   style = MaterialTheme.typography.titleLarge)},
-           text = {
-               Column() {
-                   Text(
-                       text = "Add new note",
-                       style = MaterialTheme.typography.titleMedium
-                   )
-                   OutlinedTextField(
-                       value = title,
-                       onValueChange = {},
-                       modifier = Modifier.padding(top = 10.dp),
-                       label = {Text("title")},
-                   )
-                   OutlinedTextField(
-                       value = description,
-                       onValueChange = {},
-                       modifier = Modifier.padding(top = 10.dp),
-                       label = {Text("description")},
-                   )
-               }
-           },
-           onDismissRequest = {
-               showDialog = false
-               title = ""
-               description = ""
-           },
-           confirmButton = {
-               Button(
-                   onClick = {
-                       //viewModel.saveNote(title,description)
-                       showDialog = false
-                       title = ""
-                       description = ""
-                   }
-               ) {
-                   Text("Save")
-               }
-           }
-       )
+    if (showDialog) {
+        AlertDialog(
+            title = {
+                Text(
+                    text = "New note",
+                    color = Color.Blue,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            },
+            text = {
+                Column() {
+                    OutlinedTextField(
+                        value = uiState.title,
+                        onValueChange = {
+                            viewModel.onTitleChange(it)
+                        },
+                        modifier = Modifier.padding(top = 10.dp),
+                        label = { Text("title") },
+                    )
+                    OutlinedTextField(
+                        value = uiState.description,
+                        onValueChange = {
+                            viewModel.onDescriptionChange(it)
+                        },
+                        modifier = Modifier.padding(top = 10.dp),
+                        label = { Text("description") },
+                    )
+                }
+            },
+            onDismissRequest = {
+                showDialog = false
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.insertNote()
+                        showDialog = false
+                    }
+                ) {
+                    Text("Save")
+                }
+            }
+        )
     }
-
 }
 
 @Composable
-fun NoteRow(item: Note, onItemClick: () -> Unit) {
+fun NoteRow(item: Note, onItemClick: () -> Unit, onDelete: () -> Unit) {
     Card(
         modifier = Modifier.padding(12.dp),
         shape = RoundedCornerShape(12.dp),
@@ -144,8 +155,17 @@ fun NoteRow(item: Note, onItemClick: () -> Unit) {
                 .padding(12.dp)
                 .clickable {
                     onItemClick()
-                }) {
-            Text(text = item.title)
+                }, horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(text = item.title, style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(12.dp))
+                Text(text = item.description, style = MaterialTheme.typography.bodyMedium)
+            }
+
+            IconButton(onClick = { onDelete() }) {
+                Icon(imageVector = Icons.Default.Delete, "Delete item")
+            }
         }
     }
 }
