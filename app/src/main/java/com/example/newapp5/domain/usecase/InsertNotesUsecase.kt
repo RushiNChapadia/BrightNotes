@@ -1,4 +1,11 @@
 package com.example.newapp5.domain.usecase
 
-class InsertNotesUsecase {
+import com.example.newapp5.domain.repository.NotesRepository
+import javax.inject.Inject
+
+class InsertNotesUsecase @Inject constructor(val notesRepository: NotesRepository){
+
+    suspend fun invoke(){
+
+    }
 }
